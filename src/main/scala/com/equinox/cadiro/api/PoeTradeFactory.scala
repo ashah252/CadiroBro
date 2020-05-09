@@ -16,8 +16,20 @@ object PoeTradeFactory {
       })
   }
 
-  def getStats: Option[PoeTradeStaticStats] = None
+  def getStats: Option[PoeTradeStaticStats] = {
+    HttpNetManager.sr(
+      HttpNetManager.createGet(ApiHostConf.statsHost),
+      httpUriResponse => {
+        PoeTradeStaticStats(httpUriResponse)
+      })
+  }
 
-  def getItems: Option[PoeTradeStaticItems] = None
+  def getItems: Option[PoeTradeStaticItems] = {
+    HttpNetManager.sr(
+      HttpNetManager.createGet(ApiHostConf.itemsHost),
+      httpUriResponse => {
+        PoeTradeStaticItems(httpUriResponse)
+      })
+  }
 
 }

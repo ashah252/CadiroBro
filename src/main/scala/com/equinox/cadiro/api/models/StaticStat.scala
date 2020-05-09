@@ -1,12 +1,31 @@
 package com.equinox.cadiro.api.models
 
-case class StaticStat(
-                       label: String,
-                       entries: List[StaticStatEntry]
+import play.api.libs.json.{Json, OFormat}
+
+case class StaticStatCategory(
+                       label: Option[String],
+                       entries: Option[List[StaticStatEntry]]
                      )
 
 case class StaticStatEntry(
                             id: String,
                             text: String,
-                            entryType: String
+                            `type`: Option[String]
                           )
+
+case class StaticStats(
+                      result: List[StaticStatCategory]
+                      )
+
+
+object StaticStats {
+  implicit val staticItemsFormat: OFormat[StaticStats] = Json.format[StaticStats]
+}
+
+object StaticStatCategory {
+  implicit val staticItemFormat: OFormat[StaticStatCategory] = Json.format[StaticStatCategory]
+}
+
+object StaticStatEntry {
+  implicit val staticItemEntryFormat: OFormat[StaticStatEntry] = Json.format[StaticStatEntry]
+}
