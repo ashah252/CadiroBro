@@ -1,7 +1,7 @@
 package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
-import com.equinox.cadiro.api.models.{League, SearchQuery, SearchQueryRoot, SearchResult, Sorting, Status}
+import com.equinox.cadiro.api.models.{FetchResult, FetchResultRoot, League, SearchQuery, SearchQueryRoot, SearchResult}
 import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
@@ -15,7 +15,13 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
 
   def getNext: Option[CadiroObservable] = {
     if (iterResultList.hasNext) {
-      Some(CadiroObservable(cadiroBuilder, searchResult, ApiHostConf.fetchHost.concat(iterResultList.next().mkString(",").concat("?query=").concat(searchResult.id))))
+      val url = ApiHostConf.fetchHost.concat(iterResultList.next().mkString(",").concat("?query=").concat(searchResult.id))
+      println(url)
+      HttpNetManager.sr(
+        HttpNetManager.createGet(url),
+        closeableHttpResponse => {
+          CadiroObservable(cadiroBuilder, searchResult, closeableHttpResponse)
+        })
     } else {
       None
     }
@@ -26,14 +32,24 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
 class CadiroObservable(
                        override val cadiroBuilder: CadiroBuilder[CompleteSearchQuery],
                        override val searchResult: SearchResult,
-                       val url: String)
+                       val observableList: List[FetchResult])
   extends Cadiro(cadiroBuilder, searchResult) {
-    println(url)
-    println(HttpNetManager.sr(HttpNetManager.createGet(url), http => scala.io.Source.fromInputStream(http.getEntity.getContent).mkString))
+  observableList.foreach(println(_))
 }
 
 object CadiroObservable {
-  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, observableList: String): CadiroObservable = new CadiroObservable(cadiroBuilder, searchResult, observableList)
+  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, closeableHttpResponse: CloseableHttpResponse): CadiroObservable = {
+
+    new CadiroObservable(
+      cadiroBuilder,
+      searchResult,
+      Json.parse(
+        HttpNetManager
+          .getEntity(closeableHttpResponse)
+          .getOrElse("")
+      ).as[FetchResultRoot].result
+    )
+  }
 }
 
 sealed trait SearchEntry

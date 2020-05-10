@@ -1,4 +1,6 @@
-package com.equinox.cadiro.api.models
+package com.equinox.cadiro.api
+
+import com.equinox.cadiro.api.models.SortingOption
 
 trait Sorting {
   def toSortingOption: Option[SortingOption]

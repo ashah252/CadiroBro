@@ -1,4 +1,6 @@
-package com.equinox.cadiro.api.models
+package com.equinox.cadiro.api
+
+import com.equinox.cadiro.api.models.StatusOption
 
 trait Status {
   def toStatusOption: StatusOption
