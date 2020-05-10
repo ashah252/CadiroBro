@@ -11,6 +11,8 @@ import org.slf4j.{Logger, LoggerFactory}
 object HttpNetManager {
 
   final val OK_RESPONSE: Int = 200
+  final val CONTENT_TYPE: String = "Content-type"
+  final val JSON: String = "application/json"
   final val logger: Logger = LoggerFactory.getLogger(HttpNetManager.getClass)
 
   def getEntity(closeableHttpResponse: CloseableHttpResponse): Option[String] = {
@@ -21,9 +23,10 @@ object HttpNetManager {
     }
   }
 
-  def createPost(url: String, entity: StringEntity): HttpPost = {
+  def createPost(url: String, entity: String): HttpPost = {
     val httpPost: HttpPost = new HttpPost(url)
-    httpPost.setEntity(entity)
+    httpPost.setEntity(new StringEntity(entity))
+    httpPost.setHeader(CONTENT_TYPE, JSON)
     httpPost
   }
 
