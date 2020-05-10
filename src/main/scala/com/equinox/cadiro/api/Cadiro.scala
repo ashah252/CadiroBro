@@ -1,19 +1,24 @@
 package com.equinox.cadiro.api
 
+import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
 import com.equinox.cadiro.api.models.{League, SearchQuery, SearchQueryRoot, SearchResult, Sorting, Status}
 import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
 
 
-class Cadiro(val searchResult: SearchResult) extends PoeTrade {
-  override def refresh: Option[PoeTrade] = ???
+case class Cadiro(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult) extends PoeTrade {
+  override def refresh: Option[Cadiro] = cadiroBuilder.execute
+
+
 }
 
 sealed trait SearchEntry
 object Cadiro {
-  def apply(closeableHttpResponse: CloseableHttpResponse): Cadiro = {
+
+  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], closeableHttpResponse: CloseableHttpResponse): Cadiro = {
     new Cadiro(
+      cadiroBuilder,
       Json.parse(
         HttpNetManager
           .getEntity(closeableHttpResponse)
@@ -22,6 +27,7 @@ object Cadiro {
       ).as[SearchResult]
     )
   }
+
 
   def setLeague(league: String): CadiroBuilder[LeagueEntry] = CadiroBuilder[LeagueEntry](League(league, league))
   def setLeague(league: League): CadiroBuilder[LeagueEntry] = CadiroBuilder[LeagueEntry](league)
@@ -51,15 +57,21 @@ case class CadiroBuilder[E <: SearchEntry](
   def setType(`type`: String): CadiroBuilder[E] = this.copy(`type` = Some(`type`))
   def setOrder(order: Sorting): CadiroBuilder[E] = this.copy(order = Some(order))
 
+
+  def imprint(implicit ev: E =:= Cadiro.CompleteSearchQuery): CadiroBuilder[CompleteSearchQuery] = {
+    this.asInstanceOf[CadiroBuilder[CompleteSearchQuery]]
+  }
+
   def execute(implicit ev: E =:= Cadiro.CompleteSearchQuery): Option[Cadiro] = {
     val searchQuery = SearchQuery(status.get.toStatusOption, name.get, `type`)
-    val url = ApiHostConf.searchHost.concat(league.id.capitalize)
+    val url = ApiHostConf.searchHost.concat(league.id.capitalize.trim)
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
+
 
     HttpNetManager.sr(
       HttpNetManager.createPost(url, entity),
       closeableHttpResponse => {
-        Cadiro(closeableHttpResponse)
+        Cadiro(this.imprint, closeableHttpResponse)
       }
     )
   }
