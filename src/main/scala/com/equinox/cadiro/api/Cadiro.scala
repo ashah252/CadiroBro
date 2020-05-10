@@ -7,10 +7,33 @@ import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
 
 
-case class Cadiro(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult) extends PoeTrade {
+class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchResult: SearchResult) extends PoeTrade {
+
+  protected val iterResultList: Iterator[List[String]] = searchResult.result.getOrElse(List()).grouped(ApiHostConf.pageLimit)
+
   override def refresh: Option[Cadiro] = cadiroBuilder.execute
 
+  def getNext: Option[CadiroObservable] = {
+    if (iterResultList.hasNext) {
+      Some(CadiroObservable(cadiroBuilder, searchResult, ApiHostConf.fetchHost.concat(iterResultList.next().mkString(",").concat("?query=").concat(searchResult.id))))
+    } else {
+      None
+    }
+  }
 
+}
+
+class CadiroObservable(
+                       override val cadiroBuilder: CadiroBuilder[CompleteSearchQuery],
+                       override val searchResult: SearchResult,
+                       val url: String)
+  extends Cadiro(cadiroBuilder, searchResult) {
+    println(url)
+    println(HttpNetManager.sr(HttpNetManager.createGet(url), http => scala.io.Source.fromInputStream(http.getEntity.getContent).mkString))
+}
+
+object CadiroObservable {
+  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, observableList: String): CadiroObservable = new CadiroObservable(cadiroBuilder, searchResult, observableList)
 }
 
 sealed trait SearchEntry

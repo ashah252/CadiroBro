@@ -20,5 +20,5 @@ object Main extends App {
     .execute
 
   println(cadiro.get.searchResult)
-  println(cadiro.get.refresh.get.searchResult)
+  cadiro.get.getNext
 }

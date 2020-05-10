@@ -3,11 +3,14 @@ package com.equinox.cadiro.utils
 import com.typesafe.config.ConfigFactory
 
 object ApiHostConf {
-  private val config = ConfigFactory.load("application.conf").getConfig("poe.api")
+  private val apiConfig = ConfigFactory.load("application.conf").getConfig("poe.api")
+  private val poeConfig = ConfigFactory.load("application.conf").getConfig("poe")
 
-  val leaguesHost: String = config.getString("leaguesHost")
-  val itemsHost: String = config.getString("itemsHost")
-  val statsHost: String = config.getString("statsHost")
-  val searchHost: String = config.getString("searchHost")
+  val leaguesHost: String = apiConfig.getString("leaguesHost")
+  val itemsHost: String = apiConfig.getString("itemsHost")
+  val statsHost: String = apiConfig.getString("statsHost")
+  val searchHost: String = apiConfig.getString("searchHost")
+  val fetchHost: String = apiConfig.getString("fetchHost")
 
+  val pageLimit: Int = poeConfig.getInt("pageLimit")
 }
