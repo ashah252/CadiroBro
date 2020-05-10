@@ -1,11 +1,11 @@
 package com.equinox.cadiro
 
-import com.equinox.cadiro.api.{PoeTradeFactory, PoeTradeStaticItems}
+import com.equinox.cadiro.api.db.CadiroDB
 
 object Main extends App {
-  println(PoeTradeFactory.getAvailableLeagues.get.getLeague("Delirium"))
+  println(CadiroDB.getAvailableLeagues.get.getLeague("Delirium"))
 
-  println(PoeTradeFactory.getItems)
+  println(CadiroDB.getItems)
 
-  println(PoeTradeFactory.getStats)
+  println(CadiroDB.getStats)
 }

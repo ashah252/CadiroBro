@@ -1,12 +1,8 @@
-package com.equinox.cadiro.api
+package com.equinox.cadiro.api.db
 
-import com.equinox.cadiro.api.models.League
 import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
 
-
-object PoeTradeFactory {
-
-  def setLeague(league: League): PoeTradeSearch = PoeTradeSearch()
+object CadiroDB {
 
   def getAvailableLeagues: Option[PoeTradeLeagues] = {
     HttpNetManager.sr(

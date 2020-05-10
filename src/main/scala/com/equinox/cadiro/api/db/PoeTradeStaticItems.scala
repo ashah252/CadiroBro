@@ -1,6 +1,7 @@
-package com.equinox.cadiro.api
+package com.equinox.cadiro.api.db
 
-import com.equinox.cadiro.api.models.{Leagues, StaticItemCategory, StaticItems}
+import com.equinox.cadiro.api.PoeTrade
+import com.equinox.cadiro.api.models.{StaticItemCategory, StaticItems}
 import com.equinox.cadiro.utils.HttpNetManager
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
@@ -19,4 +20,6 @@ object PoeTradeStaticItems {
   }
 }
 
-case class PoeTradeStaticItems(items: List[StaticItemCategory])
+class PoeTradeStaticItems(items: List[StaticItemCategory]) extends PoeTrade {
+  override def refresh: Option[PoeTradeStaticItems] = CadiroDB.getItems
+}
