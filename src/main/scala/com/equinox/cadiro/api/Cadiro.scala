@@ -2,7 +2,7 @@ package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
 import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, League, SearchQuery, SearchQueryRoot, SearchResult}
-import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
+import com.equinox.cadiro.utils.{ApiHostConf, CadiroLogManager, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
 
@@ -14,15 +14,18 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
   override def refresh: Option[Cadiro] = cadiroBuilder.execute
 
   def getNext: Option[CadiroObservable] = {
+    CadiroLogManager.logger.info("Fetching Next Group of Items")
     if (iterResultList.hasNext) {
-      val url = ApiHostConf.fetchHost.concat(iterResultList.next().mkString(",").concat("?query=").concat(searchResult.id))
-      println(url)
+      val url = Cadiro.getFetchUrl(iterResultList.next(), searchResult.id)
+      CadiroLogManager.logger.info("Sending Get Request: {}", url)
+
       HttpNetManager.sr(
         HttpNetManager.createGet(url),
         closeableHttpResponse => {
           CadiroObservable(cadiroBuilder, searchResult, closeableHttpResponse)
         })
     } else {
+      CadiroLogManager.logger.info("No Items Left to Fetch")
       None
     }
   }
@@ -34,12 +37,18 @@ class CadiroObservable(
                        override val searchResult: SearchResult,
                        val observableList: List[FetchResult])
   extends Cadiro(cadiroBuilder, searchResult) {
-  observableList.foreach(println(_))
+
+  observableList.foreach(fetchResult => {
+    CadiroLogManager.logger.debug("Id: {}", fetchResult.id)
+    CadiroLogManager.logger.debug("Item: {}", fetchResult.item)
+    CadiroLogManager.logger.debug("Listing: ", fetchResult.listing)
+  })
+
 }
 
 object CadiroObservable {
   def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, closeableHttpResponse: CloseableHttpResponse): CadiroObservable = {
-
+    CadiroLogManager.logger.info("Parsing Fetch Result Json into Cadiro Models")
     new CadiroObservable(
       cadiroBuilder,
       searchResult,
@@ -56,6 +65,7 @@ sealed trait SearchEntry
 object Cadiro {
 
   def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], closeableHttpResponse: CloseableHttpResponse): Cadiro = {
+    CadiroLogManager.logger.info("Parsing Search Result Json into Cadiro Models")
     new Cadiro(
       cadiroBuilder,
       Json.parse(
@@ -67,9 +77,16 @@ object Cadiro {
     )
   }
 
+  def getFetchUrl(fetchIds: List[String], searchId: String): String = ApiHostConf.fetchHost.concat(fetchIds.mkString(",").concat("?query=").concat(searchId))
 
-  def setLeague(league: String): CadiroBuilder[LeagueEntry] = CadiroBuilder[LeagueEntry](League(league, league))
-  def setLeague(league: League): CadiroBuilder[LeagueEntry] = CadiroBuilder[LeagueEntry](league)
+  def setLeague(league: String): CadiroBuilder[LeagueEntry] = {
+    CadiroLogManager.logger.info("Setting League: {}", league)
+    CadiroBuilder[LeagueEntry](League(league, league))
+  }
+  def setLeague(league: League): CadiroBuilder[LeagueEntry] = {
+    CadiroLogManager.logger.info("Setting League: {}", league.id)
+    CadiroBuilder[LeagueEntry](league)
+  }
 
   sealed trait LeagueEntry extends SearchEntry
   sealed trait StatusEntry extends SearchEntry
@@ -89,23 +106,41 @@ case class CadiroBuilder[E <: SearchEntry](
                                           ) {
 
   // mandatory
-  def search(name: String): CadiroBuilder[E with Cadiro.NameEntry] = this.copy(name = Some(name))
-  def setStatus(status: Status): CadiroBuilder[E with Cadiro.StatusEntry] = this.copy(status = Some(status))
+  def search(name: String): CadiroBuilder[E with Cadiro.NameEntry] = {
+    CadiroLogManager.logger.info("Setting Search Query: {}", name)
+    this.copy(name = Some(name))
+  }
+
+  def setStatus(status: Status): CadiroBuilder[E with Cadiro.StatusEntry] = {
+    CadiroLogManager.logger.info("Setting Status Filter: {}", status)
+    this.copy(status = Some(status))
+  }
 
   // optional
-  def setType(`type`: String): CadiroBuilder[E] = this.copy(`type` = Some(`type`))
-  def setOrder(order: Sorting): CadiroBuilder[E] = this.copy(order = Some(order))
+  def setType(`type`: String): CadiroBuilder[E] = {
+    CadiroLogManager.logger.info("Setting Type Filter: {}", `type`)
+    this.copy(`type` = Some(`type`))
+  }
+  def setOrder(order: Sorting): CadiroBuilder[E] = {
+    CadiroLogManager.logger.info("Setting Ordering Filter: {}", order)
+    this.copy(order = Some(order))
+  }
 
 
   def imprint(implicit ev: E =:= Cadiro.CompleteSearchQuery): CadiroBuilder[CompleteSearchQuery] = {
+    CadiroLogManager.logger.info("Saving State of Current Builder Configs")
     this.asInstanceOf[CadiroBuilder[CompleteSearchQuery]]
   }
 
   def execute(implicit ev: E =:= Cadiro.CompleteSearchQuery): Option[Cadiro] = {
+    CadiroLogManager.logger.info("Executing Query From Builder Configs")
+
     val searchQuery = SearchQuery(status.get.toStatusOption, name.get, `type`)
     val url = ApiHostConf.searchHost.concat(league.id.capitalize.trim)
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
 
+    CadiroLogManager.logger.info("Sending Post Request: {}", url)
+    CadiroLogManager.logger.debug("Post Request Entity: {}", entity)
 
     HttpNetManager.sr(
       HttpNetManager.createPost(url, entity),

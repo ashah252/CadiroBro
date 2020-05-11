@@ -13,7 +13,6 @@ object HttpNetManager {
   final val OK_RESPONSE: Int = 200
   final val CONTENT_TYPE: String = "Content-type"
   final val JSON: String = "application/json"
-  final val logger: Logger = LoggerFactory.getLogger(HttpNetManager.getClass)
 
   def getEntity(closeableHttpResponse: CloseableHttpResponse): Option[String] = {
     closeableHttpResponse.getEntity match {
@@ -40,11 +39,11 @@ object HttpNetManager {
 
     response.getStatusLine.getStatusCode match {
       case OK_RESPONSE =>
-        logger.info("Received Http 200 OK")
+        CadiroLogManager.logger.info("Received Http 200 OK")
         Some(success(response))
 
       case statusCode =>
-        logger.info("Didnt Receive Http 200 OK, Status = {}", statusCode)
+        CadiroLogManager.logger.info("Didnt Receive Http 200 OK, Status = {}", statusCode)
         None
     }
   }

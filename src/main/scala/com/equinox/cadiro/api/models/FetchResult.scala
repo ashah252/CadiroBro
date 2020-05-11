@@ -1,12 +1,18 @@
 package com.equinox.cadiro.api.models
 
-import play.api.libs.json.{Json, OFormat}
+import play.api.libs.json.{JsValue, Json, OFormat}
 
+/**
+ * @deprecated
+ */
 case class Value (
                    `0`: String,
                    `1`: Int
                  )
 
+/**
+ * @deprecated
+ */
 case class HashValue (
                    `0`: String,
                    `1`: List[Int]
@@ -32,8 +38,8 @@ case class Account (
 
 
 case class Hashes (
-                    `implicit`: Option[List[HashValue]],
-                    explicit: Option[List[HashValue]]
+                    `implicit`: Option[List[JsValue]],
+                    explicit: Option[List[JsValue]]
                   )
 
 
@@ -52,7 +58,7 @@ case class Mods (
 
 case class Price (
                    `type`: String,
-                   amount: Int,
+                   amount: Double,
                    currency: String
                  )
 
@@ -91,14 +97,14 @@ case class Listing (
 
 case class Properties (
                         name: String,
-                        values: Option[List[Value]],
+                        values: Option[List[JsValue]],
                         displayMode: Int,
                         `type`: Int
                       )
 
 case class Requirements (
                           name: String,
-                          values: Option[List[Value]],
+                          values: Option[List[JsValue]],
                           displayMode: Int
                         )
 
@@ -192,17 +198,17 @@ object Implicit {
 }
 
 object IncubatedItem {
-  implicit val implicitFormat: OFormat[IncubatedItem] = Json.format[IncubatedItem]
+  implicit val incubatedItemFormat: OFormat[IncubatedItem] = Json.format[IncubatedItem]
 }
 
 object Hashes {
-  implicit val implicitFormat: OFormat[Hashes] = Json.format[Hashes]
+  implicit val hashesFormat: OFormat[Hashes] = Json.format[Hashes]
 }
 
 object HashValue {
-  implicit val implicitFormat: OFormat[HashValue] = Json.format[HashValue]
+  implicit val hashValueFormat: OFormat[HashValue] = Json.format[HashValue]
 }
 
 object Properties {
-  implicit val implicitFormat: OFormat[Properties] = Json.format[Properties]
+  implicit val propertyFormat: OFormat[Properties] = Json.format[Properties]
 }

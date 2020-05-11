@@ -18,6 +18,5 @@ object Main extends App {
     .setType("Leather Belt")
     .execute
 
-  println(cadiro.get.searchResult)
   cadiro.get.getNext
 }
