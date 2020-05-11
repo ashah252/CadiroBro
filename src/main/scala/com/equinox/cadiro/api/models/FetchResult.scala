@@ -108,12 +108,19 @@ case class Requirements (
                           displayMode: Int
                         )
 
+case class ItemSocket(
+                     group: Int,
+                     attr: String,
+                     sColour: String,
+                     )
+
 case class Item (
                   verified: Boolean,
                   w: Int,
                   h: Int,
                   icon: String,
                   league: String,
+                  sockets: Option[List[ItemSocket]],
                   name: String,
                   typeLine: String,
                   identified: Boolean,
@@ -121,9 +128,9 @@ case class Item (
                   note: Option[String],
                   properties: Option[List[Properties]],
                   requirements: Option[List[Requirements]],
-                  implicitMods: List[String],
-                  explicitMods: List[String],
-                  flavourText: List[String],
+                  implicitMods: Option[List[String]],
+                  explicitMods: Option[List[String]],
+                  flavourText: Option[List[String]],
                   frameType: Int,
                   incubatedItem: Option[IncubatedItem],
                   extended: Option[Extended]
@@ -151,6 +158,10 @@ object FetchResult {
 
 object Item {
   implicit val itemFormat: OFormat[Item] = Json.format[Item]
+}
+
+object ItemSocket{
+  implicit val itemSocketFormat: OFormat[ItemSocket] = Json.format[ItemSocket]
 }
 
 object Extended {
@@ -212,3 +223,4 @@ object HashValue {
 object Properties {
   implicit val propertyFormat: OFormat[Properties] = Json.format[Properties]
 }
+

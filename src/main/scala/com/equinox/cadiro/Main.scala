@@ -13,10 +13,9 @@ object Main extends App {
   val cadiro = Cadiro
     .setLeague("Delirium")
     .setStatus(Online())
-    .search("Headhunter")
+    .search("Tabula Rasa")
     .setOrder(Ascending())
-    .setType("Leather Belt")
     .execute
 
-  cadiro.get.getNext.get.getNext
+  cadiro.get.getNext
 }
