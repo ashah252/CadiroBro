@@ -11,6 +11,7 @@ object ApiHostConf {
   val statsHost: String = apiConfig.getString("statsHost")
   val searchHost: String = apiConfig.getString("searchHost")
   val fetchHost: String = apiConfig.getString("fetchHost")
+  val uniquesHost: String = apiConfig.getString("uniquesHost")
 
   val pageLimit: Int = poeConfig.getInt("pageLimit")
 }

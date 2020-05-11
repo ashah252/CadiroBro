@@ -63,6 +63,9 @@ case class Price (
                  )
 
 case class Extended (
+                      ev: Option[Int],
+                      ar: Option[Int],
+                      es: Option[Int],
                       mods: Option[Mods],
                       hashes: Option[Hashes],
                       text: String
