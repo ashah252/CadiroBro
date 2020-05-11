@@ -41,7 +41,7 @@ class CadiroObservable(
   observableList.foreach(fetchResult => {
     CadiroLogManager.logger.debug("Id: {}", fetchResult.id)
     CadiroLogManager.logger.debug("Item: {}", fetchResult.item)
-    CadiroLogManager.logger.debug("Listing: ", fetchResult.listing)
+    CadiroLogManager.logger.debug("Whisper: {}", fetchResult.listing.get.whisper)
   })
 
 }
