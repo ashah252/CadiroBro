@@ -1,7 +1,7 @@
 package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
-import com.equinox.cadiro.api.models.{FetchResult, FetchResultRoot, League, SearchQuery, SearchQueryRoot, SearchResult}
+import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, League, SearchQuery, SearchQueryRoot, SearchResult}
 import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
@@ -47,7 +47,7 @@ object CadiroObservable {
         HttpNetManager
           .getEntity(closeableHttpResponse)
           .getOrElse("")
-      ).as[FetchResultRoot].result
+      ).as[FetchRootInterface].result
     )
   }
 }

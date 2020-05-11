@@ -2,91 +2,141 @@ package com.equinox.cadiro.api.models
 
 import play.api.libs.json.{Json, OFormat}
 
-case class Stash(
-                  name: Option[String],
-                  x: Option[Double],
-                  y: Option[Double]
-                )
-case class OnlineStatus(
-                         league: Option[String]
-                       )
-case class Account(
-                    name: Option[String],
-                    lastCharacterName: Option[String],
-                    online: Option[OnlineStatus],
-                    language: Option[String]
-                  )
-case class Price(
-                  `type`: Option[String],
-                  amount: Option[Double],
-                  currency: Option[String]
-                )
-case class Listing(
-                    method: Option[String],
-                    indexed: Option[String],
-                    stash: Option[Stash],
-                    whisper: Option[String],
-                    account: Option[Account],
-                    price: Option[Price]
-                  )
-case class Values(
-                   `0`: Option[String],
-                   `1`: Option[Double]
+case class Value (
+                   `0`: String,
+                   `1`: Int
                  )
-case class Requirements(
-                         name: Option[String],
-                         values: Option[List[Values]],
-                         displayMode: Option[Double]
-                       )
-case class Magnitudes(
-                       hash: Option[String],
-                       min: Option[Double],
-                       max: Option[Double]
-                     )
-case class ModEntry(
-                     name: Option[String],
-                     tier: Option[String],
-                     magnitudes: Option[List[Magnitudes]]
-                   )
-case class Mods(
-                 `implicit`: Option[List[ModEntry]],
-                 explicit: Option[List[ModEntry]]
-               )
-case class Extended(
-                     mods: Option[Mods],
-                     hashes: Option[Mods],
-                     text: Option[String]
-                   )
-case class Item(
-                 verified: Option[Boolean],
-                 w: Option[Double],
-                 h: Option[Double],
-                 icon: Option[String],
-                 league: Option[String],
-                 name: Option[String],
-                 typeLine: Option[String],
-                 identified: Option[Boolean],
-                 ilvl: Option[Double],
-                 note: Option[String],
-                 corrupted: Option[Boolean],
-                 requirements: Option[List[Requirements]],
-                 implicitMods: Option[List[String]],
-                 explicitMods: Option[List[String]],
-                 flavourText: Option[List[String]],
-                 frameType: Option[Double],
-                 extended: Option[Extended]
-               )
-case class FetchResult(
-                        id: Option[String],
-                        listing: Option[Listing],
-                        item: Option[Item]
-                      )
-case class FetchResultRoot(
-                            result: List[FetchResult]
-                          )
 
-object FetchResultRoot {
-  implicit val fetchResultRootFormat: OFormat[FetchResultRoot] = Json.format[FetchResultRoot]
+case class HashValue (
+                   `0`: String,
+                   `1`: List[Int]
+                 )
+
+case class OnlineStatus (
+                          league: String
+                        )
+
+
+case class Magnitudes (
+                        hash: String,
+                        min: Int,
+                        max: Int
+                      )
+
+case class Account (
+                     name: String,
+                     lastCharacterName: String,
+                     online: Option[OnlineStatus],
+                     language: String
+                   )
+
+
+case class Hashes (
+                    `implicit`: Option[List[HashValue]],
+                    explicit: Option[List[HashValue]]
+                  )
+
+
+case class Implicit (
+                      name: String,
+                      tier: String,
+                      magnitudes: Option[List[Magnitudes]]
+                    )
+
+case class Mods (
+                  `implicit`: Option[List[Implicit]],
+                  enchant: Option[List[Implicit]],
+                  explicit: Option[List[Implicit]]
+                )
+
+
+case class Price (
+                   `type`: String,
+                   amount: Int,
+                   currency: String
+                 )
+
+case class Extended (
+                      mods: Option[Mods],
+                      hashes: Option[Hashes],
+                      text: String
+                    )
+
+
+case class Stash (
+                   name: String,
+                   x: Int,
+                   y: Int
+                 )
+
+
+
+case class IncubatedItem (
+                           name: String,
+                           level: Int,
+                           progress: Int,
+                           total: Int
+                         )
+
+case class Listing (
+                     method: String,
+                     indexed: String,
+                     stash: Option[Stash],
+                     whisper: String,
+                     account: Option[Account],
+                     price: Option[Price]
+                   )
+
+
+
+case class Properties (
+                        name: String,
+                        values: Option[List[Value]],
+                        displayMode: Int,
+                        `type`: Int
+                      )
+
+case class Requirements (
+                          name: String,
+                          values: Option[List[Value]],
+                          displayMode: Int
+                        )
+
+case class Item (
+                  verified: Boolean,
+                  w: Int,
+                  h: Int,
+                  icon: String,
+                  league: String,
+                  name: String,
+                  typeLine: String,
+                  identified: Boolean,
+                  ilvl: Int,
+                  note: String,
+                  properties: Option[List[Properties]],
+                  requirements: Option[List[Requirements]],
+                  implicitMods: List[String],
+                  explicitMods: List[String],
+                  flavourText: List[String],
+                  frameType: Int,
+                  incubatedItem: Option[IncubatedItem],
+                  extended: Option[Extended]
+                )
+
+case class FetchResult (
+                    id: String,
+                    listing: Option[Listing],
+                    item: Option[Item]
+                  )
+
+case class FetchRootInterface (
+                           result: List[FetchResult]
+                         )
+
+
+
+object FetchRootInterface {
+  implicit val fetchResultRootFormat: OFormat[FetchRootInterface] = Json.format[FetchRootInterface]
 }
 
 object FetchResult {
@@ -105,10 +155,6 @@ object Mods {
   implicit val modsFormat: OFormat[Mods] = Json.format[Mods]
 }
 
-object ModEntry {
-  implicit val modEntryFormat: OFormat[ModEntry] = Json.format[ModEntry]
-}
-
 object Magnitudes {
   implicit val magnitudesFormat: OFormat[Magnitudes] = Json.format[Magnitudes]
 }
@@ -117,8 +163,8 @@ object Requirements {
   implicit val requirementsFormat: OFormat[Requirements] = Json.format[Requirements]
 }
 
-object Values {
-  implicit val valuesFormat: OFormat[Values] = Json.format[Values]
+object Value {
+  implicit val valuesFormat: OFormat[Value] = Json.format[Value]
 }
 
 object Listing {
@@ -139,4 +185,24 @@ object OnlineStatus {
 
 object Stash {
   implicit val stashFormat: OFormat[Stash] = Json.format[Stash]
+}
+
+object Implicit {
+  implicit val implicitFormat: OFormat[Implicit] = Json.format[Implicit]
+}
+
+object IncubatedItem {
+  implicit val implicitFormat: OFormat[IncubatedItem] = Json.format[IncubatedItem]
+}
+
+object Hashes {
+  implicit val implicitFormat: OFormat[Hashes] = Json.format[Hashes]
+}
+
+object HashValue {
+  implicit val implicitFormat: OFormat[HashValue] = Json.format[HashValue]
+}
+
+object Properties {
+  implicit val implicitFormat: OFormat[Properties] = Json.format[Properties]
 }
