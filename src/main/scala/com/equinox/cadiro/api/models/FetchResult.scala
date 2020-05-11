@@ -118,7 +118,7 @@ case class Item (
                   typeLine: String,
                   identified: Boolean,
                   ilvl: Int,
-                  note: String,
+                  note: Option[String],
                   properties: Option[List[Properties]],
                   requirements: Option[List[Requirements]],
                   implicitMods: List[String],

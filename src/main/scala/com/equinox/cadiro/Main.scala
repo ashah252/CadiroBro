@@ -18,5 +18,5 @@ object Main extends App {
     .setType("Leather Belt")
     .execute
 
-  cadiro.get.getNext
+  cadiro.get.getNext.get.getNext
 }
