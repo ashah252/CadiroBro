@@ -1,6 +1,8 @@
 package com.equinox.cadiro.utils
 
 
+import java.net.URLEncoder
+
 import org.apache.http.HttpEntity
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost, HttpUriRequest}
 import org.apache.http.entity.StringEntity
@@ -13,6 +15,9 @@ object HttpNetManager {
   final val OK_RESPONSE: Int = 200
   final val CONTENT_TYPE: String = "Content-type"
   final val JSON: String = "application/json"
+  final val defaultEncoding: String = "utf-8"
+
+  def encodeUrl(url: String): String = URLEncoder.encode(url, defaultEncoding)
 
   def getEntity(closeableHttpResponse: CloseableHttpResponse): Option[String] = {
     closeableHttpResponse.getEntity match {
@@ -23,13 +28,20 @@ object HttpNetManager {
   }
 
   def createPost(url: String, entity: String): HttpPost = {
+
+    val httpEntity: HttpEntity = new StringEntity(entity)
+
+    CadiroLogManager.logger.info("Creating Post Request: {}", url)
+    CadiroLogManager.logger.debug("Post Request Entity: {}", httpEntity)
+
     val httpPost: HttpPost = new HttpPost(url)
-    httpPost.setEntity(new StringEntity(entity))
+    httpPost.setEntity(httpEntity)
     httpPost.setHeader(CONTENT_TYPE, JSON)
     httpPost
   }
 
   def createGet(url: String): HttpGet = {
+    CadiroLogManager.logger.info("Creating Get Request: {}", url)
     new HttpGet(url)
   }
 

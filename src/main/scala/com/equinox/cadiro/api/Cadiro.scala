@@ -17,7 +17,6 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
     CadiroLogManager.logger.info("Fetching Next Group of Items")
     if (iterResultList.hasNext) {
       val url = Cadiro.getFetchUrl(iterResultList.next(), searchResult.id)
-      CadiroLogManager.logger.info("Sending Get Request: {}", url)
 
       HttpNetManager.sr(
         HttpNetManager.createGet(url),
@@ -136,11 +135,8 @@ case class CadiroBuilder[E <: SearchEntry](
     CadiroLogManager.logger.info("Executing Query From Builder Configs")
 
     val searchQuery = SearchQuery(status.get.toStatusOption, name.get, `type`)
-    val url = ApiHostConf.searchHost.concat(league.id.capitalize.trim)
+    val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
-
-    CadiroLogManager.logger.info("Sending Post Request: {}", url)
-    CadiroLogManager.logger.debug("Post Request Entity: {}", entity)
 
     HttpNetManager.sr(
       HttpNetManager.createPost(url, entity),

@@ -1,11 +1,10 @@
 package com.equinox.cadiro.api.db
 
-import com.equinox.cadiro.utils.{ApiHostConf, CadiroLogManager, HttpNetManager}
+import com.equinox.cadiro.utils.{ApiHostConf, HttpNetManager}
 
 object CadiroDB {
 
   def getAvailableLeagues: Option[PoeTradeLeagues] = {
-    CadiroLogManager.logger.info("Sending Get Request: {}", ApiHostConf.leaguesHost)
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.leaguesHost),
@@ -15,7 +14,6 @@ object CadiroDB {
   }
 
   def getStats: Option[PoeTradeStaticStats] = {
-    CadiroLogManager.logger.info("Sending Get Request: {}", ApiHostConf.statsHost)
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.statsHost),
@@ -25,7 +23,6 @@ object CadiroDB {
   }
 
   def getItems: Option[PoeTradeStaticItems] = {
-    CadiroLogManager.logger.info("Sending Get Request: {}", ApiHostConf.itemsHost)
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.itemsHost),
@@ -35,7 +32,6 @@ object CadiroDB {
   }
 
   def getUniques: Option[PoeTradeUniqueItems] = {
-    CadiroLogManager.logger.info("Sending Get Request: {}", ApiHostConf.uniquesHost)
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.uniquesHost),
