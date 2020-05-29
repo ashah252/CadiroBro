@@ -134,7 +134,7 @@ case class CadiroBuilder[E <: SearchEntry](
   def execute(implicit ev: E =:= Cadiro.CompleteSearchQuery): Option[Cadiro] = {
     CadiroLogManager.logger.info("Executing Query From Builder Configs")
 
-    val searchQuery = SearchQuery(status.get.toStatusOption, name.get, `type`)
+    val searchQuery = SearchQuery(status.get.toStatusOption, name.get, None, `type`) // TODO: None for filters (temporary)
     val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
 

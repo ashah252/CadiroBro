@@ -32,7 +32,7 @@ object HttpNetManager {
     val httpEntity: HttpEntity = new StringEntity(entity)
 
     CadiroLogManager.logger.info("Creating Post Request: {}", url)
-    CadiroLogManager.logger.debug("Post Request Entity: {}", httpEntity)
+    CadiroLogManager.logger.debug("Post Request Entity: {}", scala.io.Source.fromInputStream(httpEntity.getContent).mkString)
 
     val httpPost: HttpPost = new HttpPost(url)
     httpPost.setEntity(httpEntity)

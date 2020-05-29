@@ -8,15 +8,15 @@ object Main extends App {
   val leagues = CadiroDB.getAvailableLeagues.get
   CadiroLogManager.logger.debug("Leagues: {}", leagues.leagues)
 
-  CadiroDB.getItems.get.items.foreach(CadiroLogManager.logger.debug("Static Item: {}", _))
-  CadiroDB.getUniques.get.items.foreach(CadiroLogManager.logger.debug("Unique Item: {}", _))
+//  CadiroDB.getItems.get.items.foreach(CadiroLogManager.logger.trace("Static Item: {}", _))
+//  CadiroDB.getUniques.get.items.foreach(CadiroLogManager.logger.trace("Unique Item: {}", _))
 
-  CadiroLogManager.logger.debug("Static Stats: {}", CadiroDB.getStats.get.stats)
+//  CadiroLogManager.logger.trace("Static Stats: {}", CadiroDB.getStats.get.stats)
 
   val cadiro = Cadiro
-    .setLeague(leagues.getLeague("Hardcore Delirium").get)
+    .setLeague(leagues.getLeague("Delirium").get)
     .setStatus(Online())
-    .search("Farrul's Fur")
+    .search("Headhunter")
     .setOrder(Ascending())
     .execute
 
