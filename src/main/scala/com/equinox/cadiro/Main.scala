@@ -1,6 +1,7 @@
 package com.equinox.cadiro
 
-import com.equinox.cadiro.api.{Ascending, Cadiro, Online}
+import com.equinox.cadiro.api.ArmourFilterOption.Armour
+import com.equinox.cadiro.api.{ArmourFilter, Ascending, Cadiro, CadiroFilter, Min, Online}
 import com.equinox.cadiro.api.db.CadiroDB
 import com.equinox.cadiro.utils.CadiroLogManager
 
@@ -16,8 +17,9 @@ object Main extends App {
   val cadiro = Cadiro
     .setLeague(leagues.getLeague("Delirium").get)
     .setStatus(Online())
-    .search("Headhunter")
+    .search("Farrul's Fur")
     .setOrder(Ascending())
+    .addFilter(ArmourFilter(Armour, Some(Min(1)), None))
     .execute
 
   cadiro.get.getNext
