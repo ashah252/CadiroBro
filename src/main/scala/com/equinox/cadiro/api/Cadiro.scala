@@ -1,7 +1,7 @@
 package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
-import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, League, SearchQuery, SearchQueryRoot, SearchResult}
+import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, FilterList, League, SearchQuery, SearchQueryRoot, SearchResult}
 import com.equinox.cadiro.utils.{ApiHostConf, CadiroLogManager, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
@@ -102,6 +102,7 @@ case class CadiroBuilder[E <: SearchEntry](
                                             status: Option[Status] = None,
                                             `type`: Option[String] = None,
                                             order: Option[Sorting] = None,
+                                            filterList: List[CadiroFilter] = List()
                                           ) {
 
   // mandatory
@@ -125,6 +126,10 @@ case class CadiroBuilder[E <: SearchEntry](
     this.copy(order = Some(order))
   }
 
+  def addFilter(filter: CadiroFilter): CadiroBuilder[E] = {
+    this.copy(filterList = filterList :+ filter)
+  }
+
 
   def imprint(implicit ev: E =:= Cadiro.CompleteSearchQuery): CadiroBuilder[CompleteSearchQuery] = {
     CadiroLogManager.logger.info("Saving State of Current Builder Configs")
@@ -134,7 +139,12 @@ case class CadiroBuilder[E <: SearchEntry](
   def execute(implicit ev: E =:= Cadiro.CompleteSearchQuery): Option[Cadiro] = {
     CadiroLogManager.logger.info("Executing Query From Builder Configs")
 
-    val searchQuery = SearchQuery(status.get.toStatusOption, name.get, None, `type`) // TODO: None for filters (temporary)
+    val searchQuery = SearchQuery(
+      status.get.toStatusOption,
+      name.get,
+      Some(filterList.foldRight(FilterList(None, None))((filter, filterAcc) => filter.integrate(filterAcc))),
+      `type`
+    )
     val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
 

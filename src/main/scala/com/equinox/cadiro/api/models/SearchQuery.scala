@@ -25,7 +25,7 @@ case class FilterList(
 
 
 case class ArmourFilters(
-                        filters: Option[ArmourFilterType]
+                        filters: ArmourFilterType
                      )
 
 
@@ -45,7 +45,7 @@ case class ArmourOption(
 
 
 case class SocketFilters(
-                             filters: Option[SocketFilterType]
+                             filters: SocketFilterType
                            )
 
 case class SocketFilterType(
