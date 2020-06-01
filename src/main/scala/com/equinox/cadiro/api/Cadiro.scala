@@ -127,6 +127,7 @@ case class CadiroBuilder[E <: SearchEntry](
   }
 
   def addFilter(filter: CadiroFilter): CadiroBuilder[E] = {
+    CadiroLogManager.logger.info("Adding Filter Type: {}", filter.getType)
     this.copy(filterList = filterList :+ filter)
   }
 

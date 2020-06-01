@@ -102,7 +102,7 @@ case class Properties (
                         name: String,
                         values: Option[List[JsValue]],
                         displayMode: Int,
-                        `type`: Int
+                        `type`: Option[Int]
                       )
 
 case class Requirements (
