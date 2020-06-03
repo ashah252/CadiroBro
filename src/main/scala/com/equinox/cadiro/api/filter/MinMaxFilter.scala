@@ -2,7 +2,7 @@ package com.equinox.cadiro.api.filter
 
 import com.equinox.cadiro.api.models.MinMaxOption
 
-abstract class MinMaxFilter(val `type`: CadiroFilterOption, val range: Option[Range]) extends CadiroFilter(`type`){
+abstract class MinMaxFilter(override val `type`: CadiroFilterOption, val range: Option[Range]) extends CadiroFilter(`type`){
 
 	def toMinMaxOptionModel: MinMaxOption = {
 		range match {

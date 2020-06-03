@@ -19,16 +19,31 @@ case class SortingOption(price: String)
 case class StatusOption(option: String)
 
 case class FilterList(
+                        type_filters: Option[TypeFilters],
                         armour_filters: Option[ArmourFilters],
                         socket_filters: Option[SocketFilters],
                         weapon_filters: Option[WeaponFilters]
                      )
 
 
+
 case class MinMaxOption(
                          min: Option[Int],
                          max: Option[Int]
                        )
+
+case class SimpleOption(
+                       option: String
+                       )
+
+case class TypeFilters(
+                      filters: TypeFilterType
+                      )
+
+case class TypeFilterType(
+                          category: Option[SimpleOption],
+                          rarity: Option[SimpleOption]
+                         )
 
 case class WeaponFilters(
                         filters: WeaponFilterType
@@ -115,6 +130,18 @@ object WeaponFilterType {
 
 object ArmourFilters {
   implicit val searchArmourFiltersFormat: OFormat[ArmourFilters] = Json.format[ArmourFilters]
+}
+
+object TypeFilters {
+  implicit val searchTypeFiltersFormat: OFormat[TypeFilters] = Json.format[TypeFilters]
+}
+
+object TypeFilterType {
+  implicit val searchTypeFilterTypeFormat: OFormat[TypeFilterType] = Json.format[TypeFilterType]
+}
+
+object SimpleOption {
+  implicit val searchSimpleOptionFormat: OFormat[SimpleOption] = Json.format[SimpleOption]
 }
 
 object MinMaxOption {

@@ -23,7 +23,7 @@ object Main extends App {
     .setStatus(Online())
     .search("Farrul's Fur")
     .setOrder(Ascending())
-    .addFilter(SocketFilter(Links, Some(Range.min(6))).withBlueColors(1).withRedColors(4))
+    .addFilter(SocketFilter(Links, Some(Range.min(6))).withWhiteColors(3))
     .execute
 
   cadiro.get.getNext
