@@ -20,9 +20,28 @@ case class StatusOption(option: String)
 
 case class FilterList(
                         armour_filters: Option[ArmourFilters],
-                        socket_filters: Option[SocketFilters]
+                        socket_filters: Option[SocketFilters],
+                        weapon_filters: Option[WeaponFilters]
                      )
 
+
+case class MinMaxOption(
+                         min: Option[Int],
+                         max: Option[Int]
+                       )
+
+case class WeaponFilters(
+                        filters: WeaponFilterType
+                        )
+
+case class WeaponFilterType(
+                             damage: Option[MinMaxOption],
+                             pdps: Option[MinMaxOption],
+                             crit: Option[MinMaxOption],
+                             aps: Option[MinMaxOption],
+                             dps: Option[MinMaxOption],
+                             edps: Option[MinMaxOption]
+                           )
 
 case class ArmourFilters(
                         filters: ArmourFilterType
@@ -31,17 +50,12 @@ case class ArmourFilters(
 
 
 case class ArmourFilterType(
-                          ar: Option[ArmourOption],
-                          es: Option[ArmourOption],
-                          ev: Option[ArmourOption],
-                          block: Option[ArmourOption]
+                          ar: Option[MinMaxOption],
+                          es: Option[MinMaxOption],
+                          ev: Option[MinMaxOption],
+                          block: Option[MinMaxOption]
 
                         )
-
-case class ArmourOption(
-                         min: Option[Int],
-                         max: Option[Int]
-                       )
 
 
 case class SocketFilters(
@@ -90,13 +104,21 @@ object SocketFilterType {
   implicit val searchSocketFilterTypeFormat: OFormat[SocketFilterType] = Json.format[SocketFilterType]
 }
 
+object WeaponFilters {
+  implicit val searchWeaponFiltersFormat: OFormat[WeaponFilters] = Json.format[WeaponFilters]
+}
+
+object WeaponFilterType {
+  implicit val searchWeaponFilterTypeFormat: OFormat[WeaponFilterType] = Json.format[WeaponFilterType]
+}
+
 
 object ArmourFilters {
   implicit val searchArmourFiltersFormat: OFormat[ArmourFilters] = Json.format[ArmourFilters]
 }
 
-object ArmourOption {
-  implicit val searchArmourOptionFormat: OFormat[ArmourOption] = Json.format[ArmourOption]
+object MinMaxOption {
+  implicit val searchMinMaxOptionFormat: OFormat[MinMaxOption] = Json.format[MinMaxOption]
 }
 
 object SocketFilters {

@@ -1,6 +1,7 @@
 package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
+import com.equinox.cadiro.api.filter.{CadiroFilter, Sorting, Status}
 import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, FilterList, League, SearchQuery, SearchQueryRoot, SearchResult}
 import com.equinox.cadiro.utils.{ApiHostConf, CadiroLogManager, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -143,7 +144,7 @@ case class CadiroBuilder[E <: SearchEntry](
     val searchQuery = SearchQuery(
       status.get.toStatusOption,
       name.get,
-      Some(filterList.foldRight(FilterList(None, None))((filter, filterAcc) => filter.integrate(filterAcc))),
+      Some(filterList.foldRight(CadiroFilter.emptyFilter)((filter, filterAcc) => filter.integrate(filterAcc))),
       `type`
     )
     val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))

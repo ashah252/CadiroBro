@@ -1,9 +1,11 @@
 package com.equinox.cadiro
 
-import com.equinox.cadiro.api.ArmourFilterOption.{Armour, Evasion}
-import com.equinox.cadiro.api.SocketFilterOption.Links
-import com.equinox.cadiro.api.{Any, ArmourFilter, Ascending, Cadiro, CadiroFilter, Descending, Min, Online, SocketFilter}
+import com.equinox.cadiro.api.Cadiro
+import com.equinox.cadiro.api.filter.ArmourFilterOption.{Armour, Evasion}
+import com.equinox.cadiro.api.filter.SocketFilterOption.Links
+import com.equinox.cadiro.api.filter.{Any, Descending, Online, Range}
 import com.equinox.cadiro.api.db.CadiroDB
+import com.equinox.cadiro.api.filter.{Ascending, Online, SocketFilter}
 import com.equinox.cadiro.api.models.SocketOption
 import com.equinox.cadiro.utils.CadiroLogManager
 
@@ -19,11 +21,9 @@ object Main extends App {
   val cadiro = Cadiro
     .setLeague(leagues.getLeague("Delirium").get)
     .setStatus(Online())
-    .search("Soul Taker")
+    .search("Farrul's Fur")
     .setOrder(Ascending())
-//    .addFilter(ArmourFilter(Armour, Some(Min(1)), None))
-//    .addFilter(ArmourFilter(Evasion, Some(Min(1)), None))
-//    .addFilter(SocketFilter(Links, SocketOption(None, None, None, None, Some(6), None)))
+    .addFilter(SocketFilter(Links, Some(Range.min(6))).withBlueColors(1).withRedColors(4))
     .execute
 
   cadiro.get.getNext

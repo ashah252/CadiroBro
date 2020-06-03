@@ -1,4 +1,4 @@
-package com.equinox.cadiro.api
+package com.equinox.cadiro.api.filter
 
 import com.equinox.cadiro.api.models.StatusOption
 
