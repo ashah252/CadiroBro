@@ -90,11 +90,9 @@ object Cadiro {
 
   sealed trait LeagueEntry extends SearchEntry
   sealed trait StatusEntry extends SearchEntry
-  sealed trait NameEntry extends SearchEntry
-  sealed trait TypeEntry extends SearchEntry
-  sealed trait OrderEntry extends SearchEntry
+  sealed trait SimpleFilterEntry extends SearchEntry
 
-  type CompleteSearchQuery = LeagueEntry with NameEntry with StatusEntry
+  type CompleteSearchQuery = LeagueEntry with StatusEntry with SimpleFilterEntry
 }
 
 case class CadiroBuilder[E <: SearchEntry](
@@ -107,27 +105,23 @@ case class CadiroBuilder[E <: SearchEntry](
                                           ) {
 
   // mandatory
-  def search(name: String): CadiroBuilder[E with Cadiro.NameEntry] = {
-    CadiroLogManager.logger.info("Setting Search Query: {}", name)
-    this.copy(name = Some(name))
-  }
-
   def setStatus(status: Status): CadiroBuilder[E with Cadiro.StatusEntry] = {
     CadiroLogManager.logger.info("Setting Status Filter: {}", status)
     this.copy(status = Some(status))
   }
 
-  // optional
-  def setType(`type`: String): CadiroBuilder[E] = {
-    CadiroLogManager.logger.info("Setting Type Filter: {}", `type`)
-    this.copy(`type` = Some(`type`))
+  // need at least one
+  def searchItem(name: String): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
+    CadiroLogManager.logger.info("Setting Search Query: {}", name)
+    this.copy(name = Some(name))
   }
-  def setOrder(order: Sorting): CadiroBuilder[E] = {
+
+  def setPriceOrder(order: Sorting): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
     CadiroLogManager.logger.info("Setting Ordering Filter: {}", order)
     this.copy(order = Some(order))
   }
 
-  def addFilter(filter: CadiroFilter): CadiroBuilder[E] = {
+  def addFilter(filter: CadiroFilter): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
     CadiroLogManager.logger.info("Adding Filter Type: {}", filter.getType)
     this.copy(filterList = filterList :+ filter)
   }
@@ -143,7 +137,7 @@ case class CadiroBuilder[E <: SearchEntry](
 
     val searchQuery = SearchQuery(
       status.get.toStatusOption,
-      name.get,
+      name,
       Some(filterList.foldRight(CadiroFilter.emptyFilter)((filter, filterAcc) => filter.integrate(filterAcc))),
       `type`
     )

@@ -9,7 +9,7 @@ case class SearchQueryRoot(
 
 case class SearchQuery(
                       status: StatusOption,
-                      name: String,
+                      name: Option[String],
                       filters: Option[FilterList],
                       `type`: Option[String],
                       )

@@ -3,9 +3,10 @@ package com.equinox.cadiro
 import com.equinox.cadiro.api.Cadiro
 import com.equinox.cadiro.api.filter.ArmourFilterOption.{Armour, Evasion}
 import com.equinox.cadiro.api.filter.SocketFilterOption.Links
-import com.equinox.cadiro.api.filter.{Any, Descending, Online, Range}
+import com.equinox.cadiro.api.filter.{Any, Ascending, Descending, Online, Range, RarityFilter, SocketFilter, TypeFilter}
 import com.equinox.cadiro.api.db.CadiroDB
-import com.equinox.cadiro.api.filter.{Ascending, Online, SocketFilter}
+import com.equinox.cadiro.api.filter.RarityFilterOption.{Normal, Rare, Unique}
+import com.equinox.cadiro.api.filter.TypeFilterOption.Bow
 import com.equinox.cadiro.api.models.SocketOption
 import com.equinox.cadiro.utils.CadiroLogManager
 
@@ -21,9 +22,11 @@ object Main extends App {
   val cadiro = Cadiro
     .setLeague(leagues.getLeague("Delirium").get)
     .setStatus(Online())
-    .search("Farrul's Fur")
-    .setOrder(Ascending())
-    .addFilter(SocketFilter(Links, Some(Range.min(6))).withWhiteColors(3))
+//    .searchItem("Farrul's Fur")
+    .setPriceOrder(Ascending())
+    .addFilter(SocketFilter(Links, Some(Range.min(6))))
+    .addFilter(RarityFilter(Normal))
+    .addFilter(TypeFilter(Bow))
     .execute
 
   cadiro.get.getNext
