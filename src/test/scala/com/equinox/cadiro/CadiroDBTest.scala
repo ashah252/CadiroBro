@@ -7,31 +7,32 @@ import com.equinox.cadiro.api.filter.SocketFilterOption.Links
 import com.equinox.cadiro.api.filter.TypeFilterOption.Bow
 import com.equinox.cadiro.api.filter.{Ascending, Online, Range, RarityFilter, SocketFilter, TypeFilter}
 import com.equinox.cadiro.utils.CadiroLogManager
+
 import org.junit.Test
+import org.junit.Assert._
 
 class CadiroDBTest {
 
   @Test
-  def testingPlayGround(): Unit = {
-    val leagues = CadiroDB.getAvailableLeagues.get
-    CadiroLogManager.logger.debug("Leagues: {}", leagues.leagues)
+  def testLeagueConnection(): Unit = {
+    val cadiroDB = CadiroDB.getAvailableLeagues
 
-    //  CadiroDB.getItems.get.items.foreach(CadiroLogManager.logger.trace("Static Item: {}", _))
-    //  CadiroDB.getUniques.get.items.foreach(CadiroLogManager.logger.trace("Unique Item: {}", _))
+    assertTrue(cadiroDB.isDefined)
 
-    //  CadiroLogManager.logger.trace("Static Stats: {}", CadiroDB.getStats.get.stats)
+    val leagues = cadiroDB.get
 
-    val cadiro = Cadiro
-      .setLeague(leagues.getLeague("Delirium").get)
-      .setStatus(Online())
-      //    .searchItem("Farrul's Fur")
-      .setPriceOrder(Ascending())
-      .addFilter(SocketFilter(Links, Some(Range.min(6))))
-      .addFilter(RarityFilter(Normal))
-      .addFilter(TypeFilter(Bow))
-      .execute
+    val standardLeague = leagues.getLeague("Standard")
 
-    cadiro.get.getNext
+    assertTrue(standardLeague.isDefined)
+
+    val hardcoreStdLeague = leagues.getLeague("Hardcore")
+
+    assertTrue(hardcoreStdLeague.isDefined)
+
+    val pastLeague = leagues.getLeague("Legion")
+
+    assertTrue(pastLeague.isEmpty)
+
   }
 
 }
