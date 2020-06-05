@@ -3,8 +3,12 @@ package com.equinox.cadiro.utils
 import com.typesafe.config.ConfigFactory
 
 object ApiHostConf {
-  private val apiConfig = ConfigFactory.load("application.conf").getConfig("poe.api")
-  private val poeConfig = ConfigFactory.load("application.conf").getConfig("poe")
+
+  private val cadiroConfig = ConfigFactory.load()
+  cadiroConfig.checkValid(ConfigFactory.defaultReference())
+
+  private val apiConfig = cadiroConfig.getConfig("poe.api")
+  private val poeConfig = cadiroConfig.getConfig("poe")
 
   val leaguesHost: String = apiConfig.getString("leaguesHost")
   val itemsHost: String = apiConfig.getString("itemsHost")

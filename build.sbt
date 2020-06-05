@@ -22,7 +22,11 @@ libraryDependencies ++= Seq(
   "junit" % "junit" % "4.12" % Test,
   "com.novocode" % "junit-interface" % "0.11" % Test,
   "org.mockito" % "mockito-core" % "3.3.0" % Test,
-  "org.scalatest" % "scalatest_2.13" % "3.1.1" % Test
+//  "org.scalatest" % "scalatest_2.13" % "3.1.1" % Test
 )
 
 testOptions += Tests.Argument(TestFrameworks.JUnit, "-v")
+
+
+// uncomment when publishing
+//mappings in (Compile, packageBin) ~= { _.filter(!_._1.getName.equals("logback.xml")) }
