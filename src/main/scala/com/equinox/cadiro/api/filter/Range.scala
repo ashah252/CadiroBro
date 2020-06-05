@@ -1,5 +1,8 @@
 package com.equinox.cadiro.api.filter
 
+case class Min(value: Int)
+case class Max(value: Int)
+
 abstract class Range()
 
 object Range {
