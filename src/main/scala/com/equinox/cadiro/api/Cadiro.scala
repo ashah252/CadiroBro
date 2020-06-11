@@ -17,13 +17,20 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
   def getNext: Option[CadiroObservable] = {
     CadiroLogManager.logger.info("Fetching Next Group of Items")
     if (iterResultList.hasNext) {
-      val url = Cadiro.getFetchUrl(iterResultList.next(), searchResult.id)
+      val nextResultList: List[String] = iterResultList.next()
+      val url = Cadiro.getFetchUrl(nextResultList, searchResult.id)
 
       HttpNetManager.sr(
         HttpNetManager.createGet(url),
         closeableHttpResponse => {
-          CadiroObservable(cadiroBuilder, searchResult, closeableHttpResponse)
-        })
+          CadiroObservable(
+            cadiroBuilder,
+            searchResult.copy(result = searchResult.result match {
+              case Some(resultList) => Some(resultList.filterNot(nextResultList.contains(_)))
+              case None => None
+            }),
+            closeableHttpResponse
+          )})
     } else {
       CadiroLogManager.logger.info("No Items Left to Fetch")
       None
@@ -99,7 +106,7 @@ case class CadiroBuilder[E <: SearchEntry](
                                             league: League,
                                             name: Option[String] = None,
                                             status: Option[Status] = None,
-                                            `type`: Option[String] = None,
+                                            base: Option[String] = None,
                                             order: Option[Sorting] = None,
                                             filterList: List[CadiroFilter] = List()
                                           ) {
@@ -114,6 +121,11 @@ case class CadiroBuilder[E <: SearchEntry](
   def searchItem(name: String): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
     CadiroLogManager.logger.info("Setting Search Query: {}", name)
     this.copy(name = Some(name))
+  }
+
+  def setBaseItem(base: String): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
+    CadiroLogManager.logger.info("Setting Base Item Query: {}", base)
+    this.copy(base = Some(base))
   }
 
   def setPriceOrder(order: Sorting): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
@@ -139,7 +151,7 @@ case class CadiroBuilder[E <: SearchEntry](
       status.get.toStatusOption,
       name,
       Some(filterList.foldRight(CadiroFilter.emptyFilter)((filter, filterAcc) => filter.integrate(filterAcc))),
-      `type`
+      base
     )
     val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()

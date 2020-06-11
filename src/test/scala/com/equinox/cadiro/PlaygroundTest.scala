@@ -2,12 +2,11 @@ package com.equinox.cadiro
 
 import com.equinox.cadiro.api.Cadiro
 import com.equinox.cadiro.api.db.CadiroDB
-import com.equinox.cadiro.api.filter.RarityFilterOption.Normal
+import com.equinox.cadiro.api.filter.RarityFilterOption.{NonUnique, Normal}
 import com.equinox.cadiro.api.filter.SocketFilterOption.Links
 import com.equinox.cadiro.api.filter.{Ascending, Online, Range, RarityFilter, SocketFilter, TypeFilter}
-import com.equinox.cadiro.api.filter.TypeFilterOption.Bow
+import com.equinox.cadiro.api.filter.TypeFilterOption.{BodyArmour, Bow}
 import com.equinox.cadiro.utils.CadiroLogManager
-
 import org.junit.Test
 
 class PlaygroundTest {
@@ -24,13 +23,12 @@ class PlaygroundTest {
     val cadiro = Cadiro
       .setLeague(leagues.getLeague("Delirium").get)
       .setStatus(Online())
-      //    .searchItem("Farrul's Fur")
+//      .setBaseItem("Astral Plate")
       .setPriceOrder(Ascending())
-      .addFilter(SocketFilter(Links, Some(Range.min(6))))
-      .addFilter(RarityFilter(Normal))
-      .addFilter(TypeFilter(Bow))
+      .addFilter(SocketFilter(Links, Some(Range.min(6))).withWhiteColors(3))
+      .addFilter(RarityFilter(NonUnique))
       .execute
 
-    cadiro.get
+    cadiro.get.getNext.get.getNext.get.getNext.get
   }
 }
