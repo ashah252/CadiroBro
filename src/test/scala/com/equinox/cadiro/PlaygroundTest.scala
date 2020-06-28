@@ -21,7 +21,7 @@ class PlaygroundTest {
     //  CadiroLogManager.logger.trace("Static Stats: {}", CadiroDB.getStats.get.stats)
 
     val cadiro = Cadiro
-      .setLeague(leagues.getLeague("Delirium").get)
+      .setLeague(leagues.getLeague("Harvest").get)
       .setStatus(Online())
 //      .setBaseItem("Astral Plate")
       .setPriceOrder(Ascending())

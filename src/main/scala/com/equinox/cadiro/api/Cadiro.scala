@@ -84,7 +84,7 @@ object Cadiro {
     )
   }
 
-  def getFetchUrl(fetchIds: List[String], searchId: String): String = ApiHostConf.fetchHost.concat(fetchIds.mkString(",").concat("?query=").concat(searchId))
+  def getFetchUrl(fetchIds: List[String], searchId: String): String = ApiHostConf.fetchHost.concat("/" + fetchIds.mkString(",").concat("?query=").concat(searchId))
 
   def setLeague(league: String): CadiroBuilder[LeagueEntry] = {
     CadiroLogManager.logger.info("Setting League: {}", league)
@@ -153,7 +153,7 @@ case class CadiroBuilder[E <: SearchEntry](
       Some(filterList.foldRight(CadiroFilter.emptyFilter)((filter, filterAcc) => filter.integrate(filterAcc))),
       base
     )
-    val url = ApiHostConf.searchHost.concat(HttpNetManager.encodeUrl(league.id.capitalize))
+    val url = ApiHostConf.searchHost.concat("/" + HttpNetManager.encodeUrl(league.id.capitalize))
     val entity = Json.toJson(SearchQueryRoot(searchQuery, order.flatMap(_.toSortingOption))).toString()
 
     HttpNetManager.sr(
