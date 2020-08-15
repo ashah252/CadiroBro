@@ -12,10 +12,22 @@ import org.slf4j.{Logger, LoggerFactory}
 
 object HttpNetManager {
 
-  final val OK_RESPONSE: Int = 200
+
+
+
+  final val SUCCESS_RESPONSE_MIN: Int = 200
+  final val SUCCESS_RESPONSE_MAX: Int = 299
   final val CONTENT_TYPE: String = "Content-type"
-  final val JSON: String = "application/json"
+  final val JSON_CONTENT_TYPE: String = "application/json"
   final val defaultEncoding: String = "utf-8"
+
+  def isSuccess(statusCode: Int): Boolean = {
+
+    //https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+    // success is between 200 and 299
+    statusCode >= SUCCESS_RESPONSE_MIN && statusCode <= SUCCESS_RESPONSE_MAX
+
+  }
 
   def encodeUrl(url: String): String = URLEncoder.encode(url, defaultEncoding)
 
@@ -36,7 +48,7 @@ object HttpNetManager {
 
     val httpPost: HttpPost = new HttpPost(url)
     httpPost.setEntity(httpEntity)
-    httpPost.setHeader(CONTENT_TYPE, JSON)
+    httpPost.setHeader(CONTENT_TYPE, JSON_CONTENT_TYPE)
     httpPost
   }
 
@@ -50,12 +62,12 @@ object HttpNetManager {
     val response: CloseableHttpResponse = HttpClientBuilder.create.build.execute(request)
 
     response.getStatusLine.getStatusCode match {
-      case OK_RESPONSE =>
+      case statusCode if HttpNetManager.isSuccess(statusCode)  =>
         CadiroLogManager.logger.info("Received Http 200 OK")
         Some(success(response))
 
       case statusCode =>
-        CadiroLogManager.logger.info("Didnt Receive Http 200 OK, Status = {}", statusCode)
+        CadiroLogManager.logger.info("Didn't Receive Http 200 OK, Status = {}", statusCode)
         None
     }
   }

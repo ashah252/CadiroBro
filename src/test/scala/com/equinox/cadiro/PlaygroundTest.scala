@@ -29,6 +29,6 @@ class PlaygroundTest {
       .addFilter(RarityFilter(NonUnique))
       .execute
 
-    cadiro.get.getNext.get.getNext.get.getNext.get
+    cadiro.get.getNext
   }
 }
