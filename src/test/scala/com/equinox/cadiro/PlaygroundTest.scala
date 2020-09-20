@@ -2,9 +2,9 @@ package com.equinox.cadiro
 
 import com.equinox.cadiro.api.Cadiro
 import com.equinox.cadiro.api.db.CadiroDB
-import com.equinox.cadiro.api.filter.RarityFilterOption.{NonUnique, Normal}
+import com.equinox.cadiro.api.filter.RarityFilterOption.{NonUnique, Normal, Unique}
 import com.equinox.cadiro.api.filter.SocketFilterOption.Links
-import com.equinox.cadiro.api.filter.{Ascending, Online, Range, RarityFilter, SocketFilter, TypeFilter}
+import com.equinox.cadiro.api.filter.{Ascending, Online, Range, RarityFilter, RarityFilterOption, SocketFilter, TypeFilter}
 import com.equinox.cadiro.api.filter.TypeFilterOption.{BodyArmour, Bow}
 import com.equinox.cadiro.utils.CadiroLogManager
 import org.junit.Test
@@ -21,12 +21,12 @@ class PlaygroundTest {
     //  CadiroLogManager.logger.trace("Static Stats: {}", CadiroDB.getStats.get.stats)
 
     val cadiro = Cadiro
-      .setLeague(leagues.getLeague("Harvest").get)
+      .setLeague(leagues.getLeague("Heist").get)
       .setStatus(Online())
 //      .setBaseItem("Astral Plate")
       .setPriceOrder(Ascending())
-      .addFilter(SocketFilter(Links, Some(Range.min(6))).withWhiteColors(3))
-      .addFilter(RarityFilter(NonUnique))
+//      .addFilter(SocketFilter(Links, Some(Range.min(6))).withWhiteColors(3))
+      .addFilter(RarityFilter(Unique))
       .execute
 
     cadiro.get.getNext

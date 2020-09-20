@@ -10,6 +10,7 @@ case class SearchQueryRoot(
 case class SearchQuery(
                       status: StatusOption,
                       name: Option[String],
+                      stats: Option[List[StatGroup]],
                       filters: Option[FilterList],
                       `type`: Option[String],
                       )
@@ -17,6 +18,17 @@ case class SearchQuery(
 case class SortingOption(price: String)
 
 case class StatusOption(option: String)
+
+case class StatGroup(
+                    `type`: String,
+                    filters: List[StatID]
+                    )
+
+case class StatID(
+                 id: String,
+                 value: Option[MinMaxOption],
+                 disabled: Boolean = false
+                 )
 
 case class FilterList(
                         type_filters: Option[TypeFilters],
@@ -154,4 +166,12 @@ object SocketFilters {
 
 object SocketOption {
   implicit val searchSocketOptionFormat: OFormat[SocketOption] = Json.format[SocketOption]
+}
+
+object StatGroup {
+  implicit val searchStatGroupFormat: OFormat[StatGroup] = Json.format[StatGroup]
+}
+
+object StatID {
+  implicit val searchStatIDFormat: OFormat[StatID] = Json.format[StatID]
 }

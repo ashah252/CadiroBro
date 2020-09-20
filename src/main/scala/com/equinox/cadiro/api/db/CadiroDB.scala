@@ -8,8 +8,8 @@ object CadiroDB {
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.leaguesHost),
-      httpUriResponse => {
-        PoeTradeLeagues(httpUriResponse)
+      responseEntity => {
+        PoeTradeLeagues(responseEntity.getOrElse(""))
       })
   }
 
@@ -17,8 +17,8 @@ object CadiroDB {
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.statsHost),
-      httpUriResponse => {
-        PoeTradeStaticStats(httpUriResponse)
+      responseEntity => {
+        PoeTradeStaticStats(responseEntity.getOrElse(""))
       })
   }
 
@@ -26,8 +26,8 @@ object CadiroDB {
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.itemsHost),
-      httpUriResponse => {
-        PoeTradeStaticItems(httpUriResponse)
+      responseEntity => {
+        PoeTradeStaticItems(responseEntity.getOrElse(""))
       })
   }
 
@@ -35,8 +35,8 @@ object CadiroDB {
 
     HttpNetManager.sr(
       HttpNetManager.createGet(ApiHostConf.uniquesHost),
-      httpUriResponse => {
-        PoeTradeUniqueItems(httpUriResponse)
+      responseEntity => {
+        PoeTradeUniqueItems(responseEntity.getOrElse(""))
       })
   }
 

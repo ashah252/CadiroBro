@@ -6,20 +6,19 @@ import java.net.URLEncoder
 import org.apache.http.HttpEntity
 import org.apache.http.client.methods.{CloseableHttpResponse, HttpGet, HttpPost, HttpUriRequest}
 import org.apache.http.entity.StringEntity
-import org.apache.http.impl.client.HttpClientBuilder
-import org.slf4j.{Logger, LoggerFactory}
+import org.apache.http.impl.client.{CloseableHttpClient, HttpClientBuilder}
 
+import scala.util.{Failure, Success, Try, Using}
 
 object HttpNetManager {
-
-
-
 
   final val SUCCESS_RESPONSE_MIN: Int = 200
   final val SUCCESS_RESPONSE_MAX: Int = 299
   final val CONTENT_TYPE: String = "Content-type"
   final val JSON_CONTENT_TYPE: String = "application/json"
   final val defaultEncoding: String = "utf-8"
+
+  final val client: CloseableHttpClient = HttpClientBuilder.create.build;
 
   def isSuccess(statusCode: Int): Boolean = {
 
@@ -57,17 +56,33 @@ object HttpNetManager {
     new HttpGet(url)
   }
 
-  def sr[A](request: HttpUriRequest, success: CloseableHttpResponse => A): Option[A] = {
+  def sr[A](request: HttpUriRequest, success: Option[String] => A): Option[A] = {
 
-    val response: CloseableHttpResponse = HttpClientBuilder.create.build.execute(request)
+    val tryRequest: Try[Option[A]] = Using(client.execute(request)) {
+      response => {
+        response.getStatusLine.getStatusCode match {
 
-    response.getStatusLine.getStatusCode match {
-      case statusCode if HttpNetManager.isSuccess(statusCode)  =>
-        CadiroLogManager.logger.info("Received Http 200 OK")
-        Some(success(response))
+          case statusCode if HttpNetManager.isSuccess(statusCode)  =>
+            CadiroLogManager.logger.info("Received Http 200 OK")
 
-      case statusCode =>
-        CadiroLogManager.logger.info("Didn't Receive Http 200 OK, Status = {}", statusCode)
+            val responseBody: Option[String] = HttpNetManager.getEntity(response).map(body =>  new String(body)) //clone body so it is reserved when resource is closed
+            response.close()
+            Some(success(responseBody))
+
+          case statusCode =>
+            CadiroLogManager.logger.info("Didn't Receive Http 200 OK, Status = {}", statusCode)
+
+            response.close()
+            None
+        }
+      }
+    }
+
+    tryRequest match {
+      case Success(onSuccessValue) =>
+        onSuccessValue
+      case Failure(exception) =>
+        CadiroLogManager.logger.error(exception.getMessage)
         None
     }
   }

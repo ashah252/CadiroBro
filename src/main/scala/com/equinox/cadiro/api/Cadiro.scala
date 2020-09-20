@@ -1,7 +1,7 @@
 package com.equinox.cadiro.api
 
 import com.equinox.cadiro.api.Cadiro.CompleteSearchQuery
-import com.equinox.cadiro.api.filter.{CadiroFilter, Sorting, Status}
+import com.equinox.cadiro.api.filter.{CadiroFilter, Sorting, StatFilter, Status}
 import com.equinox.cadiro.api.models.{FetchResult, FetchRootInterface, FilterList, League, SearchQuery, SearchQueryRoot, SearchResult}
 import com.equinox.cadiro.utils.{ApiHostConf, CadiroLogManager, HttpNetManager}
 import org.apache.http.client.methods.CloseableHttpResponse
@@ -22,15 +22,16 @@ class Cadiro(val cadiroBuilder: CadiroBuilder[CompleteSearchQuery], val searchRe
 
       HttpNetManager.sr(
         HttpNetManager.createGet(url),
-        closeableHttpResponse => {
+        responseEntity => {
           CadiroObservable(
             cadiroBuilder,
             searchResult.copy(result = searchResult.result match {
               case Some(resultList) => Some(resultList.filterNot(nextResultList.contains(_)))
               case None => None
             }),
-            closeableHttpResponse
-          )})
+            responseEntity.getOrElse("")
+          )
+        })
     } else {
       CadiroLogManager.logger.info("No Items Left to Fetch")
       None
@@ -54,16 +55,12 @@ class CadiroObservable(
 }
 
 object CadiroObservable {
-  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, closeableHttpResponse: CloseableHttpResponse): CadiroObservable = {
+  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], searchResult: SearchResult, responseEntity: String): CadiroObservable = {
     CadiroLogManager.logger.info("Parsing Fetch Result Json into Cadiro Models")
     new CadiroObservable(
       cadiroBuilder,
       searchResult,
-      Json.parse(
-        HttpNetManager
-          .getEntity(closeableHttpResponse)
-          .getOrElse("")
-      ).as[FetchRootInterface].result
+      Json.parse(responseEntity).as[FetchRootInterface].result
     )
   }
 }
@@ -71,16 +68,11 @@ object CadiroObservable {
 sealed trait SearchEntry
 object Cadiro {
 
-  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], closeableHttpResponse: CloseableHttpResponse): Cadiro = {
+  def apply(cadiroBuilder: CadiroBuilder[CompleteSearchQuery], responseEntity: String): Cadiro = {
     CadiroLogManager.logger.info("Parsing Search Result Json into Cadiro Models")
     new Cadiro(
       cadiroBuilder,
-      Json.parse(
-        HttpNetManager
-          .getEntity(closeableHttpResponse)
-          .getOrElse("")
-
-      ).as[SearchResult]
+      Json.parse(responseEntity).as[SearchResult]
     )
   }
 
@@ -108,6 +100,7 @@ case class CadiroBuilder[E <: SearchEntry](
                                             status: Option[Status] = None,
                                             base: Option[String] = None,
                                             order: Option[Sorting] = None,
+                                            statList: List[StatFilter] = List(),
                                             filterList: List[CadiroFilter] = List()
                                           ) {
 
@@ -138,6 +131,10 @@ case class CadiroBuilder[E <: SearchEntry](
     this.copy(filterList = filterList :+ filter)
   }
 
+  def addStatFilter(filter: StatFilter): CadiroBuilder[E with Cadiro.SimpleFilterEntry] = {
+    CadiroLogManager.logger.info("Adding Stat Filter: {}", filter)
+    this.copy(statList = statList :+ filter)
+  }
 
   def imprint(implicit ev: E =:= Cadiro.CompleteSearchQuery): CadiroBuilder[CompleteSearchQuery] = {
     CadiroLogManager.logger.info("Saving State of Current Builder Configs")
@@ -150,6 +147,7 @@ case class CadiroBuilder[E <: SearchEntry](
     val searchQuery = SearchQuery(
       status.get.toStatusOption,
       name,
+      None, //fill in stats here
       Some(filterList.foldRight(CadiroFilter.emptyFilter)((filter, filterAcc) => filter.integrate(filterAcc))),
       base
     )
@@ -158,8 +156,8 @@ case class CadiroBuilder[E <: SearchEntry](
 
     HttpNetManager.sr(
       HttpNetManager.createPost(url, entity),
-      closeableHttpResponse => {
-        Cadiro(this.imprint, closeableHttpResponse)
+      responseEntity => {
+        Cadiro(this.imprint, responseEntity.getOrElse(""))
       }
     )
   }

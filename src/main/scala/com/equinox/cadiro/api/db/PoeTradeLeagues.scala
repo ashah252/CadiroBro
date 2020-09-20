@@ -3,20 +3,14 @@ package com.equinox.cadiro.api.db
 import com.equinox.cadiro.api.PoeTrade
 import com.equinox.cadiro.api.models.{League, Leagues}
 import com.equinox.cadiro.utils.{CadiroLogManager, HttpNetManager}
-import org.apache.http.client.methods.CloseableHttpResponse
 import play.api.libs.json.Json
 
 object PoeTradeLeagues {
-  def apply(closeableHttpResponse: CloseableHttpResponse): PoeTradeLeagues = {
+  def apply(responseEntity: String): PoeTradeLeagues = {
     CadiroLogManager.logger.info("Parsing Leagues")
 
     new PoeTradeLeagues(
-      Json.parse(
-        HttpNetManager
-          .getEntity(closeableHttpResponse)
-          .getOrElse("")
-
-      ).as[Leagues].result
+      Json.parse(responseEntity).as[Leagues].result
     )
   }
 }
